@@ -5,7 +5,8 @@ const dbConnection = async () => {
 		await mongoose.connect(`${process.env.DB_STRING}/mean_hospital`, {
 			useNewUrlParser: true,
 			useUnifiedTopology: true,
-			useCreateIndex: true
+			useCreateIndex: true,
+			useFindAndModify: false
 		});
 		console.log('DB connected');
 	} catch (error) {
