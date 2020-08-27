@@ -2,8 +2,13 @@ const User = require('./../models/usuario');
 const bcryptjs = require('bcryptjs');
 
 const getUsers = async (req, res) => {
-	const users = await User.find({ status: true });
-	res.json({ ok: true, users });
+	const { limit, offset } = req.body;
+
+	const [ users, total ] = await Promise.all([
+		User.find({ status: true }).limit(limit).skip(offset),
+		User.countDocuments()
+	]);
+	res.json({ ok: true, items: users, total });
 };
 
 const addUser = async (req, res) => {

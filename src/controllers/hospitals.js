@@ -5,7 +5,7 @@ const getHospitals = async (req, res) => {
 
 	const [ hospitals, total ] = await Promise.all([
 		Hospital.find({ status: true }).populate('createdBy', 'name').limit(limit).skip(offset),
-		Hospital.count()
+		Hospital.countDocuments()
 	]);
 	res.json({ ok: true, items: hospitals, total });
 };

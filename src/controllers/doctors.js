@@ -9,7 +9,7 @@ const getDoctors = async (req, res) => {
 			.populate('hospital', 'name')
 			.limit(limit)
 			.skip(offset),
-		Doctor.count()
+		Doctor.countDocuments()
 	]);
 	res.json({ ok: true, items: doctors, total });
 };

@@ -21,6 +21,7 @@ app.use(express.json());
 // mongo connection
 dbConnection();
 
+// configuracion de carpeta statica
 app.use(express.static(__dirname + '/'));
 app.use('/uploads', serveIndex(__dirname + '/uploads'));
 
