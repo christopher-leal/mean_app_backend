@@ -1,11 +1,11 @@
 const express = require('express').Router;
-const { findAll, findAllByCollection } = require('../controllers/all');
+const { fileUpload } = require('../controllers/uploads');
 const validateToken = require('../middlewares/validate-token');
+const fileup = require('express-fileupload');
 
 const router = express();
+router.use(fileup());
 
-router.post('/', validateToken, findAll);
-
-router.post('/collection', validateToken, findAllByCollection);
+router.post('/', [ validateToken ], fileUpload);
 
 module.exports = router;
