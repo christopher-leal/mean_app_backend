@@ -6,7 +6,7 @@ const validateToken = require('../middlewares/validate-token');
 
 const router = express();
 
-router.get('/', validateToken, getUsers);
+router.post('/getUsers', validateToken, getUsers);
 
 router.post(
 	'/',
