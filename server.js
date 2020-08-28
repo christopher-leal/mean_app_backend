@@ -22,7 +22,7 @@ app.use(express.json());
 dbConnection();
 
 // configuracion de carpeta statica
-app.use(express.static(__dirname + '/'));
+app.use(express.static(__dirname + '/public'));
 app.use('/uploads', serveIndex(__dirname + '/uploads'));
 
 // configuracion de rutas
