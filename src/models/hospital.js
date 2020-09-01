@@ -15,6 +15,10 @@ const HospitalSchema = Schema(
 			ref: 'User',
 			required: true
 		},
+		updatedBy: {
+			type: Schema.Types.ObjectId,
+			ref: 'User'
+		},
 		status: {
 			type: Boolean,
 			default: true

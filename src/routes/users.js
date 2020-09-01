@@ -11,7 +11,7 @@ router.post('/getUsers', validateToken, getUsers);
 router.post(
 	'/',
 	[
-		validateToken,
+		// validateToken,
 		check('name', 'El nombre es obligatorio').not().isEmpty(),
 		check('password', 'El password es obligatorio').not().isEmpty(),
 		check('email', 'El email es obligatorio').isEmail().not().isEmpty(),
@@ -20,17 +20,17 @@ router.post(
 	addUser
 );
 
-router.put(
-	'/:id',
-	[
-		validateToken,
-		check('name', 'El nombre es obligatorio').not().isEmpty(),
-		check('email', 'El email es obligatorio').isEmail().not().isEmpty(),
-		check('role', 'El rol es obligatorio').not().isEmpty(),
-		validateFields
-	],
-	updateUser
-);
+// router.put(
+// 	'/:id',
+// 	[
+// 		validateToken,
+// 		check('name', 'El nombre es obligatorio').not().isEmpty(),
+// 		check('email', 'El email es obligatorio').isEmail().not().isEmpty(),
+// 		check('role', 'El rol es obligatorio').not().isEmpty(),
+// 		validateFields
+// 	],
+// 	updateUser
+// );
 
 router.delete('/', validateToken, deleteUser);
 

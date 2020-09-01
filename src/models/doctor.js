@@ -14,6 +14,10 @@ const DoctorSchema = Schema(
 			ref: 'User',
 			required: true
 		},
+		updatedBy: {
+			type: Schema.Types.ObjectId,
+			ref: 'User'
+		},
 		hospital: {
 			type: Schema.Types.ObjectId,
 			ref: 'Hospital',

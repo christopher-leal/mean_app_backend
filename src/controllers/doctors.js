@@ -6,6 +6,7 @@ const getDoctors = async (req, res) => {
 	const [ doctors, total ] = await Promise.all([
 		Doctor.find({ status: true })
 			.populate('createdBy', 'name')
+			.populate('updatedBy', 'name')
 			.populate('hospital', 'name')
 			.limit(limit)
 			.skip(offset),
@@ -16,8 +17,9 @@ const getDoctors = async (req, res) => {
 
 const addDoctor = async (req, res) => {
 	try {
-		const { name, hospital } = req.body;
-		const id = req.id;
+		const { hospital, id, ...rest } = req.body;
+		const userId = req.id;
+		let doctor;
 
 		const hospitalDB = await Hospital.findOne({ _id: hospital });
 
@@ -25,11 +27,23 @@ const addDoctor = async (req, res) => {
 			return res.status(400).json({ ok: false, error: 'El hospital no existe' });
 		}
 
-		const doctor = new Doctor({
-			name,
-			hospital,
-			createdBy: id
-		});
+		if (id) {
+			doctor = await Doctor.findById(id);
+			if (!doctor) return res.status(400).json({ ok: false, error: 'No se encontro el doctor' });
+			doctor = await Doctor.findOneAndUpdate(
+				{ _id: id },
+				{ ...rest, hospital, updatedBy: userId },
+				{ new: true }
+			);
+			// hospital = { ...hospital, ...rest };
+		} else {
+			doctor = new Doctor({
+				name,
+				hospital,
+				createdBy: userId
+			});
+		}
+
 		await doctor.save();
 
 		res.json({ ok: true, doctor });
@@ -38,27 +52,27 @@ const addDoctor = async (req, res) => {
 	}
 };
 
-const updateDoctor = async (req, res) => {
-	try {
-		const { id } = req.params;
+// const updateDoctor = async (req, res) => {
+// 	try {
+// 		const { id } = req.params;
 
-		const doctorDB = await Doctor.findById(id);
-		if (!doctorDB) return res.status(400).json({ ok: false, error: 'No se encontro el usuario' });
+// 		const doctorDB = await Doctor.findById(id);
+// 		if (!doctorDB) return res.status(400).json({ ok: false, error: 'No se encontro el usuario' });
 
-		const { password, google, email, ...rest } = req.body;
-		if (doctorDB.email !== email) {
-			const emailExists = await Doctor.findOne({ email });
-			if (emailExists) return res.status(400).json({ ok: false, error: 'El email ya esta registrado' });
-		}
+// 		const { password, google, email, ...rest } = req.body;
+// 		if (doctorDB.email !== email) {
+// 			const emailExists = await Doctor.findOne({ email });
+// 			if (emailExists) return res.status(400).json({ ok: false, error: 'El email ya esta registrado' });
+// 		}
 
-		rest.email = email;
-		const updatedDoctor = await Doctor.findOneAndUpdate({ _id: id }, rest, { new: true });
+// 		rest.email = email;
+// 		const updatedDoctor = await Doctor.findOneAndUpdate({ _id: id }, rest, { new: true });
 
-		res.json({ ok: true, Doctor: updatedDoctor });
-	} catch (error) {
-		res.status(500).json({ ok: false, error });
-	}
-};
+// 		res.json({ ok: true, Doctor: updatedDoctor });
+// 	} catch (error) {
+// 		res.status(500).json({ ok: false, error });
+// 	}
+// };
 
 const deleteDoctor = async (req, res) => {
 	try {
@@ -66,7 +80,7 @@ const deleteDoctor = async (req, res) => {
 
 		// const deletedDoctor = await Doctor.findOneAndDelete({ _id: id });
 		const deletedDoctor = await Doctor.findOne({ _id: id });
-		if (!deletedDoctor) return res.status(400).json({ ok: false, error: 'Usuario no encontrado' });
+		if (!deletedDoctor) return res.status(400).json({ ok: false, error: 'Doctor no encontrado' });
 		deletedDoctor.status = false;
 		await deletedDoctor.save();
 		res.json({ ok: true, Doctor: deletedDoctor });
@@ -78,6 +92,5 @@ const deleteDoctor = async (req, res) => {
 module.exports = {
 	getDoctors,
 	addDoctor,
-	updateDoctor,
 	deleteDoctor
 };

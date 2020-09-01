@@ -7,6 +7,6 @@ const router = express();
 router.use(fileup());
 
 router.put('/', [ validateToken ], fileUpload);
-router.post('/', [ validateToken ], getFile);
+router.get('/:type/:file', [], getFile);
 
 module.exports = router;

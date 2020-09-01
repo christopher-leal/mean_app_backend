@@ -1,6 +1,6 @@
 const User = require('./../models/usuario');
 const bcrypt = require('bcryptjs');
-const { generateToken } = require('../helpers/jwt');
+const { generateToken, decodeToken } = require('../helpers/jwt');
 const { googleVerify } = require('../helpers/google-verify');
 
 const login = async (req, res) => {
@@ -53,7 +53,22 @@ const googleSignIn = async (req, res) => {
 	}
 };
 
+const refreshToken = async (req, res) => {
+	const token = req.headers['token'];
+	if (!token)
+		return res.status(401).json({
+			ok: false,
+			error: 'Unauthorized'
+		});
+
+	const decodedToken = decodeToken(token);
+	const user = await User.findById(decodedToken.id);
+	const newToken = generateToken({ email: decodedToken.email, role: decodedToken.role, id: decodedToken.id });
+	res.json({ ok: true, token: newToken, user });
+};
+
 module.exports = {
 	login,
-	googleSignIn
+	googleSignIn,
+	refreshToken
 };

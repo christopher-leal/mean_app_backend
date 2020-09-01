@@ -48,8 +48,7 @@ const fileUpload = async (req, res) => {
 };
 
 const getFile = (req, res) => {
-	const { file, type } = req.body;
-
+	const { file, type } = req.params;
 	let filePath = path.join(__dirname, `./../../uploads/${type}/${file}`);
 	if (fileExits(filePath)) res.sendFile(filePath);
 	else {

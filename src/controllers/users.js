@@ -13,47 +13,61 @@ const getUsers = async (req, res) => {
 
 const addUser = async (req, res) => {
 	try {
-		const { email, password } = req.body;
+		const { id, ...rest } = req.body;
+		const userId = req.id;
 
-		const userDb = await User.findOne({ email });
+		let user;
 
-		if (userDb) {
-			return res.status(400).json({ ok: false, error: 'Correo existente' });
+		if (id) {
+			user = await User.findById(id);
+			if (!user) return res.status(400).json({ ok: false, error: 'No se encontro el usuario' });
+			if (rest.password) {
+				const salt = await bcryptjs.genSalt();
+				rest.password = await bcryptjs.hash(rest.password, salt);
+			}
+			user = await User.findOneAndUpdate({ _id: id }, { ...rest, updatedBy: userId }, { new: true });
+		} else {
+			const userDb = await User.findOne({ email: rest.email });
+
+			if (userDb) {
+				return res.status(400).json({ ok: false, error: 'Correo existente' });
+			}
+
+			user = new User(req.body);
+			const salt = await bcryptjs.genSalt();
+
+			user.password = await bcryptjs.hash(rest.password, salt);
+			await user.save();
 		}
-
-		const user = new User(req.body);
-		const salt = await bcryptjs.genSalt();
-
-		user.password = await bcryptjs.hash(password, salt);
-		await user.save();
 
 		res.json({ ok: true, user });
 	} catch (error) {
+		console.log(error);
 		res.status(500).json({ ok: false, error });
 	}
 };
 
-const updateUser = async (req, res) => {
-	try {
-		const { id } = req.params;
+// const updateUser = async (req, res) => {
+// 	try {
+// 		const { id } = req.params;
 
-		const userDB = await User.findById(id);
-		if (!userDB) return res.status(400).json({ ok: false, error: 'No se encontro el usuario' });
+// 		const userDB = await User.findById(id);
+// 		if (!userDB) return res.status(400).json({ ok: false, error: 'No se encontro el usuario' });
 
-		const { password, google, email, ...rest } = req.body;
-		if (userDB.email !== email) {
-			const emailExists = await User.findOne({ email });
-			if (emailExists) return res.status(400).json({ ok: false, error: 'El email ya esta registrado' });
-		}
+// 		const { password, google, email, ...rest } = req.body;
+// 		if (userDB.email !== email) {
+// 			const emailExists = await User.findOne({ email });
+// 			if (emailExists) return res.status(400).json({ ok: false, error: 'El email ya esta registrado' });
+// 		}
 
-		rest.email = email;
-		const updatedUser = await User.findOneAndUpdate({ _id: id }, rest, { new: true });
+// 		rest.email = email;
+// 		const updatedUser = await User.findOneAndUpdate({ _id: id }, rest, { new: true });
 
-		res.json({ ok: true, user: updatedUser });
-	} catch (error) {
-		res.status(500).json({ ok: false, error });
-	}
-};
+// 		res.json({ ok: true, user: updatedUser });
+// 	} catch (error) {
+// 		res.status(500).json({ ok: false, error });
+// 	}
+// };
 
 const deleteUser = async (req, res) => {
 	try {
@@ -73,6 +87,6 @@ const deleteUser = async (req, res) => {
 module.exports = {
 	getUsers,
 	addUser,
-	updateUser,
+	// updateUser,
 	deleteUser
 };
