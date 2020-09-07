@@ -2,17 +2,25 @@ const Doctor = require('../models/doctor');
 const Hospital = require('../models/hospital');
 
 const getDoctors = async (req, res) => {
-	const { limit, offset } = req.body;
-	const [ doctors, total ] = await Promise.all([
-		Doctor.find({ status: true })
-			.populate('createdBy', 'name')
-			.populate('updatedBy', 'name')
-			.populate('hospital', 'name')
-			.limit(limit)
-			.skip(offset),
-		Doctor.countDocuments()
-	]);
-	res.json({ ok: true, items: doctors, total });
+	try {
+		const { limit, offset, id = null } = req.body;
+		let where = {};
+		if (id) {
+			where._id = id;
+		}
+		const [ doctors, total ] = await Promise.all([
+			Doctor.find(where)
+				.populate('createdBy', 'name')
+				.populate('updatedBy', 'name')
+				.populate('hospital', 'name')
+				.limit(limit)
+				.skip(offset),
+			Doctor.countDocuments(where)
+		]);
+		res.json({ ok: true, items: doctors, total });
+	} catch (error) {
+		res.json({ ok: false, error });
+	}
 };
 
 const addDoctor = async (req, res) => {
@@ -38,7 +46,7 @@ const addDoctor = async (req, res) => {
 			// hospital = { ...hospital, ...rest };
 		} else {
 			doctor = new Doctor({
-				name,
+				name: rest.name,
 				hospital,
 				createdBy: userId
 			});
@@ -48,6 +56,7 @@ const addDoctor = async (req, res) => {
 
 		res.json({ ok: true, doctor });
 	} catch (error) {
+		console.log(error);
 		res.status(500).json({ ok: false, error });
 	}
 };

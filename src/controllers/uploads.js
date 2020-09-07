@@ -4,7 +4,6 @@ const { updateFile, fileExits } = require('../helpers/update-file');
 
 const fileUpload = async (req, res) => {
 	const { id, type } = req.body;
-
 	if (!req.files || Object.keys(req.files).length === 0) {
 		return res.status(400).json({ ok: false, error: 'No files were uploaded.' });
 	}
@@ -13,7 +12,7 @@ const fileUpload = async (req, res) => {
 
 	const cutedName = file.name.split('.');
 	const fileExt = cutedName[cutedName.length - 1];
-	const validExtensions = [ 'png', 'jpeg', 'jpg', 'pdf' ];
+	const validExtensions = [ 'png', 'jpeg', 'jpg' ];
 
 	if (!validExtensions.includes(fileExt)) {
 		return res.status(400).json({

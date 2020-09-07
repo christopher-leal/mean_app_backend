@@ -5,8 +5,8 @@ const getUsers = async (req, res) => {
 	const { limit, offset } = req.body;
 
 	const [ users, total ] = await Promise.all([
-		User.find({ status: true }).limit(limit).skip(offset),
-		User.countDocuments()
+		User.find({ _id: { $nin: req.id } }).limit(limit).skip(offset),
+		User.countDocuments({ _id: { $nin: req.id } })
 	]);
 	res.json({ ok: true, items: users, total });
 };
@@ -17,13 +17,19 @@ const addUser = async (req, res) => {
 		const userId = req.id;
 
 		let user;
-
 		if (id) {
 			user = await User.findById(id);
 			if (!user) return res.status(400).json({ ok: false, error: 'No se encontro el usuario' });
 			if (rest.password) {
 				const salt = await bcryptjs.genSalt();
 				rest.password = await bcryptjs.hash(rest.password, salt);
+			}
+			if (user.email !== rest.email) {
+				const emailExists = await User.findOne({ email });
+				if (emailExists) return res.status(400).json({ ok: false, error: 'El email ya esta registrado' });
+			}
+			if (user.google) {
+				delete rest.email;
 			}
 			user = await User.findOneAndUpdate({ _id: id }, { ...rest, updatedBy: userId }, { new: true });
 		} else {

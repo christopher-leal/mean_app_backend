@@ -26,6 +26,6 @@ router.post(
 // 	updateHospital
 // );
 
-router.delete('/', validateToken, deleteHospital);
+router.post('/delete', validateToken, deleteHospital);
 
 module.exports = router;

@@ -31,6 +31,6 @@ router.post(
 // 	updateDoctor
 // );
 
-router.delete('/', validateToken, deleteDoctor);
+router.post('/delete', validateToken, deleteDoctor);
 
 module.exports = router;
