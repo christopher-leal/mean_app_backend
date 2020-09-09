@@ -2,7 +2,7 @@ const express = require('express').Router;
 const { login, googleSignIn, refreshToken } = require('../controllers/auth');
 const validateFields = require('../middlewares/validate-fields');
 const { check } = require('express-validator');
-const validateToken = require('../middlewares/validate-token');
+const { validateToken } = require('../middlewares/validate-token');
 
 const router = express();
 

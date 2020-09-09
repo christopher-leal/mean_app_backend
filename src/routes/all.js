@@ -1,6 +1,6 @@
 const express = require('express').Router;
 const { findAll, findAllByCollection } = require('../controllers/all');
-const validateToken = require('../middlewares/validate-token');
+const { validateToken } = require('../middlewares/validate-token');
 
 const router = express();
 

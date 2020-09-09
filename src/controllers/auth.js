@@ -2,6 +2,7 @@ const User = require('./../models/usuario');
 const bcrypt = require('bcryptjs');
 const { generateToken, decodeToken } = require('../helpers/jwt');
 const { googleVerify } = require('../helpers/google-verify');
+const { getMenuItems } = require('../helpers/get-menu');
 
 const login = async (req, res) => {
 	try {
@@ -15,9 +16,10 @@ const login = async (req, res) => {
 		if (!checkPass) return res.status(400).json({ ok: false, error: 'Usuario y/o contraseña incorrectos' });
 
 		const token = generateToken({ email: userDB.email, role: userDB.role, id: userDB.id });
-		res.json({ ok: true, token });
+		res.json({ ok: true, token, menuItems: getMenuItems(userDB.role) });
 	} catch (error) {
-		res.status(500).json({ ok: false, userDB });
+		console.log(error);
+		res.status(500).json({ ok: false, error });
 	}
 };
 
@@ -47,7 +49,7 @@ const googleSignIn = async (req, res) => {
 
 		const appToken = generateToken({ email: user.email, role: user.role, id: user.id });
 
-		res.json({ ok: true, token: appToken });
+		res.json({ ok: true, token: appToken, menuItems: getMenuItems(user.role) });
 	} catch (error) {
 		res.status(500).json({ ok: false, error });
 	}
@@ -64,7 +66,7 @@ const refreshToken = async (req, res) => {
 	const decodedToken = decodeToken(token);
 	const user = await User.findById(decodedToken.id);
 	const newToken = generateToken({ email: decodedToken.email, role: decodedToken.role, id: decodedToken.id });
-	res.json({ ok: true, token: newToken, user });
+	res.json({ ok: true, token: newToken, user, menuItems: getMenuItems(decodedToken.role) });
 };
 
 module.exports = {

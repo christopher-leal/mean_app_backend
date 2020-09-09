@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-
+const User = require('./../models/usuario');
 const validateToken = (req, res, next) => {
 	try {
 		const token = req.headers['token'];
@@ -14,6 +14,7 @@ const validateToken = (req, res, next) => {
 			next();
 		}
 	} catch (error) {
+		console.log(error);
 		res.status(401).json({
 			ok: false,
 			error
@@ -21,4 +22,30 @@ const validateToken = (req, res, next) => {
 	}
 };
 
-module.exports = validateToken;
+const validateRole = async (req, res, next) => {
+	try {
+		const userDB = await User.findById(req.id);
+		const { id } = req.body;
+		console.log(id);
+		if (!userDB)
+			return res.status(404).json({
+				ok: false,
+				error: 'Revisar con el administrador'
+			});
+		if (userDB.role !== 'ADMIN' && id !== req.id)
+			return res.status(403).json({
+				ok: false,
+				error: 'Unauthorized'
+			});
+
+		next();
+	} catch (error) {
+		console.log(error);
+		res.status(500).json({
+			ok: false,
+			error: 'Revisar con el administrador'
+		});
+	}
+};
+
+module.exports = { validateToken, validateRole };

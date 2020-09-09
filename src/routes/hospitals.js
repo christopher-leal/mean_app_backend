@@ -2,7 +2,7 @@ const express = require('express').Router;
 const { check } = require('express-validator');
 const { getHospitals, addHospital, deleteHospital } = require('../controllers/hospitals');
 const validateFields = require('../middlewares/validate-fields');
-const validateToken = require('../middlewares/validate-token');
+const { validateToken } = require('../middlewares/validate-token');
 
 const router = express();
 
