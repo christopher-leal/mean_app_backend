@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const { dbConnection } = require('./config/db');
 const serveIndex = require('serve-index');
-
+const path = require('path');
 // Configuracion de libreria dotenv
 require('dotenv').config();
 
@@ -33,6 +33,9 @@ app.use('/api/doctors', require('./src/routes/doctors'));
 app.use('/api/all', require('./src/routes/all'));
 app.use('/api/uploads', require('./src/routes/uploads'));
 
+app.get('*', (req, res) => {
+	res.sendFile(path.resolve(__dirname, 'public/index.html'));
+});
 app.listen(process.env.PORT, () => {
 	console.log('Servidor corriendo en el puerto: ' + process.env.PORT);
 });
